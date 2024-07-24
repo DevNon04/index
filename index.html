@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Compression Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .upload-section {
+            margin-bottom: 20px;
+        }
+        #upload-files {
+            display: none;
+        }
+        label[for="upload-files"] {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #clear-images {
+            background-color: #dc3545;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        #download-all {
+            background-color: green;
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .thumbnail-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .thumbnail-card {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .thumbnail-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .name-remove-container .name {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+            font-size: 11px;
+        }
+        .info-container {
+            position: absolute;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+        .name-remove-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 5px;
+        }
+        .name-remove-container .name {
+            font-weight: bold;
+        }
+        .name-remove-container .remove {
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .percentage {
+            text-align: center;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .download-button {
+            background-color: #007bff;
+            color: white;
+            padding: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            margin: 10px;
+        }
+
+        .download-button:hover {
+            background-color: #0056b3;
+        }
+        .download-all {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Image Compression Tool</h1>
+    <p>
+        Click UPLOAD FILES to choose up to 20 images (PNG, JPG, GIF, TIFF) you
+        want to compress. Wait for the upload and compression processes to
+        complete. If you need more control over the image compression quality
+        please use thumbnails to activate the manual mode.
+    </p>
+    <p>
+        Click DOWNLOAD ALL to get all the compressed files at once, grouped in a
+        ZIP archive. Or you can download each image individually.
+    </p>
+
+    <div class="upload-section">
+        <input
+                type="file"
+                id="upload-files"
+                accept="image/png, image/jpeg, image/gif, image/tiff"
+                multiple
+        />
+        <label for="upload-files">UPLOAD FILES</label>
+        <button id="clear-images">CLEAR</button>
+    </div>
+    <div class="thumbnail-container" id="thumbnail-container">
+        <!-- Thumbnails will be displayed here -->
+    </div>
+    <div class="download-all">
+        <button class="download-all" id="download-all">DOWNLOAD ALL</button>
+    </div>
+    <h2>What is Compression?</h2>
+    <p>
+        In relation to digital files, compression is the act of taking one file
+        and making it smaller by removing bits of information. Sometimes you’re
+        removing empty or useless bits of information so the file reduces in
+        size but it appears exactly the same. This is called lossless
+        compression. On the other hand, if you remove bits that lower the
+        quality of the file, this is known as lossy compression.
+    </p>
+    <p>
+        The tool on this page conducts a type of lossy compression by reducing
+        the available color palette or quality of an image.
+    </p>
+    <h2>Why would you want to compress an image?</h2>
+    <p>
+        Images are ideal for graphics, logos, and other simple designs because
+        they support transparency. This allows you to place an image on top of
+        another image and only cover specific parts of the image underneath.
+        This is something not possible with many other image formats.
+    </p>
+    <p>
+        High-resolution images take up a lot of space and can slow down your
+        page load time. Compressing images reduces the file size without
+        affecting its visible quality, which helps improve your website’s speed.
+    </p>
+    <h2>How can you compress an image?</h2>
+    <p>
+        Compressing an image is incredibly simple using our free online tool.
+        There’s no software to download, no need to register, and no limit to
+        the number of compressions you can do.
+    </p>
+
+    <h2>Is it safe to compress image files?</h2>
+    <p>
+        Our compression tool is not only easy to use but completely safe. The
+        server that operates the tool is fully automated, so no one sees the
+        images you upload. Also, the server automatically purges all data after
+        60 minutes, so anything you upload will be deleted just an hour later.
+        This keeps your data private and secure.
+    </p>
+    <p>
+        Also, if you are unhappy with our compression output, you’ll still have
+        your original files. You can then upload the master file again and
+        re-compress it. You can do this as many times as you wish.
+    </p>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<script>
+    const maxFileSize = 5 * 1024 * 1024; // 5 MB
+    const maxFiles = 20;
+    let compressedImages = [];
+
+    document
+        .getElementById("upload-files")
+        .addEventListener("change", function (event) {
+            const files = event.target.files;
+
+            if (files.length > maxFiles) {
+                alert(`Please upload a maximum of ${maxFiles} files.`);
+                return;
+            }
+
+            const validFiles = [];
+            for (let i = 0; i < files.length; i++) {
+                if (files[i].size > maxFileSize) {
+                    alert(
+                        `File ${files[i].name} exceeds the maximum file size of 5 MB.`
+                    );
+                } else {
+                    validFiles.push(files[i]);
+                }
+            }
+
+            handleFiles(validFiles);
+        });
+
+    function processImage(file, callback) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const img = new Image();
+            img.src = e.target.result;
+            img.onload = function () {
+                compressImage(
+                    img,
+                    0.85,
+                    function (compressedDataUrl, originalSize, compressedSize) {
+                        const reduction = Math.round(
+                            (1 - compressedSize / originalSize) * 100
+                        );
+                        callback(compressedDataUrl, file.name, reduction);
+                    }
+                );
+            };
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function handleFiles(files) {
+        const promises = [];
+        for (let i = 0; i < files.length; i++) {
+            promises.push(
+                new Promise((resolve) =>
+                    processImage(files[i], (dataUrl, fileName, reduction) => {
+                        compressedImages.push({ dataUrl, name: fileName, reduction });
+                        createThumbnail(dataUrl, fileName, reduction);
+                        resolve();
+                    })
+                )
+            );
+        }
+        Promise.all(promises).then(() => {
+            console.log("All images processed.");
+        });
+    }
+
+    function compressImage(img, quality, callback) {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+
+        // Save original size for comparison
+        const originalSize = img.src.length;
+
+        const dataUrl = canvas.toDataURL("image/jpeg", quality);
+        const compressedSize = dataUrl.length;
+
+        callback(dataUrl, originalSize, compressedSize);
+    }
+
+    function createThumbnail(dataUrl, fileName, reduction) {
+        const container = document.getElementById("thumbnail-container");
+        const card = document.createElement("div");
+        card.className = "thumbnail-card";
+
+        // Create the info container
+        const infoContainer = document.createElement("div");
+        infoContainer.className = "info-container";
+
+        // Create the name and remove button container
+        const nameRemoveContainer = document.createElement("div");
+        nameRemoveContainer.className = "name-remove-container";
+
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "name";
+        nameSpan.textContent = fileName;
+
+        const removeSpan = document.createElement("span");
+        removeSpan.className = "remove";
+        removeSpan.textContent = "×";
+        removeSpan.onclick = function () {
+            removeImage(fileName);
+        };
+
+        nameRemoveContainer.appendChild(nameSpan);
+        nameRemoveContainer.appendChild(removeSpan);
+
+        const percentageSpan = document.createElement("span");
+        percentageSpan.className = "percentage";
+        percentageSpan.textContent = `Reduction: ${reduction}%`;
+
+        const downloadLink = document.createElement("a");
+        downloadLink.className = "download-button";
+        downloadLink.href = dataUrl;
+        downloadLink.download = fileName;
+        downloadLink.textContent = "Download";
+
+        // Append elements to the info container
+        infoContainer.appendChild(nameRemoveContainer);
+        infoContainer.appendChild(percentageSpan);
+        infoContainer.appendChild(downloadLink);
+
+        const img = document.createElement("img");
+        img.src = dataUrl;
+        img.alt = fileName;
+
+        card.appendChild(infoContainer);
+        card.appendChild(img);
+        container.appendChild(card);
+    }
+
+    function dataURLToBlob(dataurl) {
+        const arr = dataurl.split(",");
+        const mime = arr[0].match(/:(.*?);/)[1];
+        const bstr = atob(arr[1]);
+        const u8arr = new Uint8Array(bstr.length);
+        for (let i = 0; i < bstr.length; i++) {
+            u8arr[i] = bstr.charCodeAt(i);
+        }
+        return new Blob([u8arr], { type: mime });
+    }
+
+    function removeImage(fileName) {
+        compressedImages = compressedImages.filter(
+            (image) => image.name !== fileName
+        );
+        const container = document.getElementById("thumbnail-container");
+        const cards = container.querySelectorAll(".thumbnail-card");
+        cards.forEach((card) => {
+            if (
+                card.querySelector(".name-remove-container .name").textContent ===
+                fileName
+            ) {
+                container.removeChild(card);
+            }
+        });
+    }
+
+    document
+        .getElementById("download-all")
+        .addEventListener("click", function () {
+            if (compressedImages.length === 0) {
+                alert("No images to download.");
+                return;
+            }
+
+            const zip = new JSZip();
+            const folder = zip.folder("compressed_images");
+
+            compressedImages.forEach((image) => {
+                const blob = dataURLToBlob(image.dataUrl);
+                folder.file(image.name, blob);
+            });
+
+            zip.generateAsync({ type: "blob" }).then(function (content) {
+                saveAs(content, "compressed_images.zip");
+            });
+        });
+
+    document
+        .getElementById("clear-images")
+        .addEventListener("click", function () {
+            const container = document.getElementById("thumbnail-container");
+            container.innerHTML = "";
+            compressedImages.length = 0;
+        });
+</script>
+</body>
+</html>
